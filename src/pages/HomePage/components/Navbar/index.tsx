@@ -18,6 +18,7 @@ const useStyles = makeStyles({
 		borderRight: '2px solid white',
 		'&:hover': {
 			opacity: '1',
+			pointer: 'cursor',
 		},
 		'&.active': {
 			opacity: '1',
@@ -52,11 +53,11 @@ const Navbar: React.FC<Props> = () => {
 				<Grid item>
 					<Typography className={classes.Typography}>Giay Vans</Typography>
 				</Grid>
-				<Grid item>
+				{/* <Grid item>
 					<Typography className={clsx(classes.Typography, classes.TypographyLast)}>
 						Giay Thoi Trang
 					</Typography>
-				</Grid>
+				</Grid> */}
 			</Grid>
 		</Grid>
 	);

@@ -9,7 +9,7 @@ interface Props {}
 const ManagementPage: React.FC<Props> = () => {
 	return (
 		<div>
-			<Grid container xs={12}>
+			<Grid container xs={12} style={{ minHeight: '100vh' }}>
 				<Grid item xs={3}>
 					<Header />
 					<Navbar />

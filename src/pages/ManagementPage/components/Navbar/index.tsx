@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import clsx from 'clsx';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
@@ -54,6 +55,20 @@ const Navbar: React.FC<Props> = () => {
 	const classes = useStyles();
 	return (
 		<Grid className={classes.root} xs={12}>
+			<Grid className={classes.PriMenu} xs={12}>
+				<Link to='/'>
+					<Grid
+						className={clsx(classes.PriItem, productMenu ? classes.PriActive : '')}
+						xs={12}
+						onClick={() => {
+							setProductMenu(!productMenu);
+							setAccountMenu(false);
+						}}
+					>
+						Trang chủ
+					</Grid>
+				</Link>
+			</Grid>
 			<Grid className={classes.PriMenu} xs={12}>
 				<Grid
 					className={clsx(classes.PriItem, productMenu ? classes.PriActive : '')}

@@ -1,14 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as yup from 'yup';
 import Grid from '@material-ui/core/Grid';
-import {
-	FormHelperText,
-	Input,
-	InputAdornment,
-	OutlinedInput,
-	Typography,
-} from '@material-ui/core';
+import { FormHelperText, InputAdornment, OutlinedInput, Typography } from '@material-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { makeStyles } from '@material-ui/core/styles';
 import { sizes, brands } from './constants.js';
@@ -51,10 +45,9 @@ const useStyles = makeStyles({
 
 const AddProductSchema = yup.object().shape({
 	prodName: yup.string().required().min(3).max(100),
-	prodColor: yup.string().required().min(3).max(100),
 	prodBrand: yup.string(),
 	prodPrice: yup.number().required().min(50000),
-	prodDescription: yup.string().required().min(50),
+	prodDescription: yup.string(),
 	prodDate: yup.date().default(function () {
 		return new Date();
 	}),
@@ -63,19 +56,22 @@ const AddProductSchema = yup.object().shape({
 interface Props {}
 
 const AddProduct: React.FC<Props> = () => {
+	//all useState sử dụng cho component
+	const [urlList, setUrlList] = useState([]); //chửa danh sách url từ người dùng nhập vào
+
+	//khai báo css
 	const classes = useStyles();
 
-	const [urlList, setUrlList] = useState([]);
-
+	//khai báo cho react-hook-dom
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
 		control,
+		reset,
 	} = useForm<productEntry>({
 		defaultValues: {
 			prodName: '',
-			prodColor: '',
 			prodSize: [],
 			prodDescription: '',
 			prodBrand: '',
@@ -83,11 +79,12 @@ const AddProduct: React.FC<Props> = () => {
 		resolver: yupResolver(AddProductSchema),
 	});
 
+	//kết nối cơ sở dữ liệu
 	const ref = app.firestore().collection('products');
 
+	//function thêm sản phầm lên cơ sở dữ liệu
 	function addProduct(
 		prodName: string,
-		prodColor: string,
 		prodBrand: string,
 		prodSize: string[],
 		prodPrice: number,
@@ -99,7 +96,6 @@ const AddProduct: React.FC<Props> = () => {
 			.doc()
 			.set({
 				prodName: prodName,
-				prodColor: prodColor,
 				prodBrand: prodBrand,
 				prodSize: prodSize,
 				prodPrice: prodPrice,
@@ -112,11 +108,10 @@ const AddProduct: React.FC<Props> = () => {
 			});
 	}
 
+	//submit xử lí của form
 	const onSubmit = async (data: productEntry) => {
 		const {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			prodName,
-			prodColor,
 			prodBrand,
 			prodSize,
 			prodPrice,
@@ -125,28 +120,19 @@ const AddProduct: React.FC<Props> = () => {
 			prodDate,
 		} = data;
 
-		const storageRef = app.storage().ref();
+		const storageRef = await app.storage().ref();
 
 		for (let i = 0; i < prodImageUrl.length; i++) {
-			let fileRef = storageRef.child(prodImageUrl[i].name);
+			let fileRef = await storageRef.child(prodImageUrl[i].name);
 			await fileRef.put(prodImageUrl[i]);
 			await fileRef.getDownloadURL().then((url) => {
 				setUrlList(urlList.push(url));
 			});
 		}
 
-		await addProduct(
-			prodName,
-			prodColor,
-			prodBrand,
-			prodSize,
-			prodPrice,
-			prodDescription,
-			urlList,
-			prodDate
-		);
-
-		console.log(urlList);
+		await addProduct(prodName, prodBrand, prodSize, prodPrice, prodDescription, urlList, prodDate);
+		await setUrlList([]);
+		await reset();
 	};
 
 	return (
@@ -160,7 +146,7 @@ const AddProduct: React.FC<Props> = () => {
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>
-							<Typography variant='h5'>Tên sản phẩm:</Typography>
+							<Typography variant='h6'>Tên sản phẩm:</Typography>
 						</Grid>
 						<Grid xs={8}>
 							<Controller
@@ -168,8 +154,11 @@ const AddProduct: React.FC<Props> = () => {
 									<TextField
 										{...field}
 										fullWidth
-										label='Yêu cầu'
+										id='prodName'
+										label='Bắt buộc'
 										variant='outlined'
+										size='small'
+										color='primary'
 										placeholder='adidas Superstar White Core Black,...'
 										error={errors?.prodName}
 										helperText={errors.prodName?.message}
@@ -181,9 +170,9 @@ const AddProduct: React.FC<Props> = () => {
 						</Grid>
 					</Grid>
 
-					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
+					{/* <Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>
-							<Typography variant='h5'>Màu sản phẩm:</Typography>
+							<Typography variant='h6'>Màu sản phẩm:</Typography>
 						</Grid>
 						<Grid xs={8}>
 							<Controller
@@ -191,8 +180,10 @@ const AddProduct: React.FC<Props> = () => {
 									<TextField
 										{...field}
 										fullWidth
-										label='Yêu cầu'
+										label='Khuyến khích'
 										variant='outlined'
+										size='small'
+										color='primary'
 										placeholder='Green,grey,black,...'
 										error={errors?.prodColor}
 										helperText={errors.prodColor?.message}
@@ -202,27 +193,30 @@ const AddProduct: React.FC<Props> = () => {
 								control={control}
 							/>
 						</Grid>
-					</Grid>
+					</Grid> */}
 
 					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>
-							<Typography variant='h5'>Kích cỡ sản phẩm:</Typography>
+							<Typography variant='h6'>Kích cỡ sản phẩm:</Typography>
 						</Grid>
 						<Grid xs={8}>
-							<InputLabel htmlFor='prodPrice'>Khuyến khích</InputLabel>
 							<Controller
 								render={({ field }) => (
-									<Select
-										{...field}
-										labelId='prodSize'
-										id='prodSize'
-										input={<Input fullWidth />}
-										multiple
-									>
-										{sizes.map((size) => (
-											<MenuItem value={size.value}>{size.title}</MenuItem>
-										))}
-									</Select>
+									<FormControl fullWidth variant='outlined'>
+										<InputLabel id='prodsize-label'>Bắt buộc</InputLabel>
+										<Select
+											{...field}
+											labelId='prodsize-label'
+											label='Bắt buộc'
+											id='prodSize'
+											color='primary'
+											multiple
+										>
+											{sizes.map((size) => (
+												<MenuItem value={size.value}>{size.title}</MenuItem>
+											))}
+										</Select>
+									</FormControl>
 								)}
 								name='prodSize'
 								control={control}
@@ -232,7 +226,7 @@ const AddProduct: React.FC<Props> = () => {
 
 					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>
-							<Typography variant='h5'>Mô tả sản phẩm:</Typography>
+							<Typography variant='h6'>Mô tả sản phẩm:</Typography>
 						</Grid>
 						<Grid xs={8}>
 							<Controller
@@ -241,6 +235,8 @@ const AddProduct: React.FC<Props> = () => {
 										{...field}
 										id='prodDescription'
 										label='Khuyến khích'
+										size='small'
+										color='primary'
 										multiline
 										rows={4}
 										fullWidth
@@ -258,19 +254,19 @@ const AddProduct: React.FC<Props> = () => {
 
 					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>
-							<Typography variant='h5'>Thương hiệu sản phẩm:</Typography>
+							<Typography variant='h6'>Thương hiệu sản phẩm:</Typography>
 						</Grid>
 						<Grid xs={8}>
 							<Controller
 								render={({ field }) => (
-									<FormControl variant='outlined'>
-										<InputLabel id='demo-simple-select-outlined-label'>Khuyến khích</InputLabel>
+									<FormControl fullWidth variant='outlined'>
+										<InputLabel id='demo-simple-select-outlined-label'>Bắt buộc</InputLabel>
 										<Select
 											{...field}
 											labelId='prodBrand'
 											id='prodBrand'
-											label='Thương hiệu'
-											style={{ minWidth: '237px' }}
+											label='Bắt buộc'
+											color='primary'
 										>
 											<MenuItem value=''>
 												<em>None</em>
@@ -289,19 +285,20 @@ const AddProduct: React.FC<Props> = () => {
 
 					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>
-							<Typography variant='h5'>Giá sản phẩm:</Typography>
+							<Typography variant='h6'>Giá sản phẩm:</Typography>
 						</Grid>
 						<Grid xs={8}>
 							<Controller
 								render={({ field }) => (
 									<FormControl variant='outlined'>
-										<InputLabel htmlFor='prodPrice'>Require*:</InputLabel>
+										<InputLabel htmlFor='prodPrice'>Bắt buộc</InputLabel>
 										<OutlinedInput
 											{...field}
 											id='prodPrice'
 											placeholder='0'
+											color='primary'
 											startAdornment={<InputAdornment position='start'>$</InputAdornment>}
-											labelWidth={60}
+											labelWidth={65}
 											error={errors?.prodPrice}
 										/>
 										<FormHelperText id='prodPrice'>{errors.prodPrice?.message}</FormHelperText>
@@ -315,7 +312,7 @@ const AddProduct: React.FC<Props> = () => {
 
 					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>
-							<Typography variant='h5'>Hình ảnh sản phẩm:</Typography>
+							<Typography variant='h6'>Hình ảnh sản phẩm:</Typography>
 						</Grid>
 						<Grid xs={8}>
 							<input
