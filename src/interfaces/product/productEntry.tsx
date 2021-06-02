@@ -3,7 +3,12 @@ export default interface productEntry {
 	prodBrand: string;
 	prodSize: string[];
 	prodPrice: number;
-	prodDescription: string;
 	prodImageUrl: FileList;
+	prodBought: number;
 	prodDate: Date;
+	prodState: boolean;
+	prodIsSale: boolean;
+	prodSale: number;
+	prodSalePrice: number;
+	prodUrlList: string[];
 }

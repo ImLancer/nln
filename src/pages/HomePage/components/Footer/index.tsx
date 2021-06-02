@@ -12,7 +12,7 @@ const useStyles = makeStyles({
 	root: {},
 	boxFooter: {
 		minHeight: '25vh',
-		backgroundColor: 'black',
+		backgroundColor: '#262626',
 		color: '#E6E6FA',
 	},
 	contact: {
@@ -20,6 +20,12 @@ const useStyles = makeStyles({
 	},
 	boxGuarantee: {
 		padding: '20px',
+	},
+	supportInfo: {
+		'&:hover': {
+			backgroundColor: '#000000',
+			color: 'yellow',
+		},
 	},
 });
 
@@ -89,16 +95,20 @@ const Footer: React.FC<Props> = () => {
 					<Typography>Hoàn tiền</Typography>
 				</Grid>
 			</Grid>
-			<Grid item xs={4}>
-				<Typography variant='h5'>Thông tin hỗ trợ</Typography>
+			<Grid item xs={4} style={{ padding: '10px' }}>
+				<Typography variant='h4'>Thông tin hỗ trợ</Typography>
 				<MenuList>
-					<MenuItem>Giới thiệu</MenuItem>
-					<MenuItem>Chính sách</MenuItem>
-					<MenuItem>Quy định chung</MenuItem>
-					<MenuItem>Chính sách bảo mật thông tin</MenuItem>
-					<MenuItem>Chính sách về vận chuyển và giao nhận</MenuItem>
-					<MenuItem>Chính sách về thanh toán và hình thức thanh toán</MenuItem>
-					<MenuItem>Đăng ký thành viên để nhận thêm thông tin</MenuItem>
+					<MenuItem className={classes.supportInfo}>Giới thiệu</MenuItem>
+					<MenuItem className={classes.supportInfo}>Chính sách</MenuItem>
+					<MenuItem className={classes.supportInfo}>Quy định chung</MenuItem>
+					<MenuItem className={classes.supportInfo}>Chính sách bảo mật thông tin</MenuItem>
+					<MenuItem className={classes.supportInfo}>Chính sách về vận chuyển và giao nhận</MenuItem>
+					<MenuItem className={classes.supportInfo}>
+						Chính sách về thanh toán và hình thức thanh toán
+					</MenuItem>
+					<MenuItem className={classes.supportInfo}>
+						Đăng ký thành viên để nhận thêm thông tin
+					</MenuItem>
 				</MenuList>
 			</Grid>
 			<Grid item container justify='center' xs={12}>

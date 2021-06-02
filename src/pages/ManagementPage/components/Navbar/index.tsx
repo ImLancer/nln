@@ -58,7 +58,7 @@ const Navbar: React.FC<Props> = () => {
 			<Grid className={classes.PriMenu} xs={12}>
 				<Link to='/'>
 					<Grid
-						className={clsx(classes.PriItem, productMenu ? classes.PriActive : '')}
+						className={clsx(classes.PriItem, false ? classes.PriActive : '')}
 						xs={12}
 						onClick={() => {
 							setProductMenu(!productMenu);

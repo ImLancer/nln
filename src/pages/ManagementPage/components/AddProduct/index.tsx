@@ -1,26 +1,47 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from 'react';
-import * as yup from 'yup';
-import Grid from '@material-ui/core/Grid';
-import { FormHelperText, InputAdornment, OutlinedInput, Typography } from '@material-ui/core';
-import { Controller, useForm } from 'react-hook-form';
-import { makeStyles } from '@material-ui/core/styles';
+//import from local
 import { sizes, brands } from './constants.js';
+
+//import react necessary
+import React, { useState } from 'react';
+import firebase, { db, app, auth } from 'firebase.js';
+
+//import cho form
+import * as yup from 'yup';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+
+//import cho redux
+
+//import interface
+import productEntry from 'interfaces/product/productEntry';
+
+//import giao dien material-ui
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Container from '@material-ui/core/Container';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
+import { FormHelperText, InputAdornment, OutlinedInput, Typography } from '@material-ui/core';
+
+//import color material-ui
+
+//import icon
 import QueueIcon from '@material-ui/icons/Queue';
 import AddPhotoAlternateIcon from '@material-ui/icons/AddPhotoAlternate';
-import productEntry from 'interfaces/product/productEntry';
-import { app } from 'firebase.js';
-import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles({
-	root: {},
+	root: {
+		height: '80%',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		flexDirection: 'column',
+	},
 	box: {},
 	boxContainer: {},
 	boxForm: {
@@ -49,7 +70,7 @@ const AddProductSchema = yup.object().shape({
 	prodPrice: yup.number().required().min(50000),
 	prodDescription: yup.string(),
 	prodDate: yup.date().default(function () {
-		return new Date();
+		return new Date(new Date().toDateString());
 	}),
 });
 
@@ -73,14 +94,19 @@ const AddProduct: React.FC<Props> = () => {
 		defaultValues: {
 			prodName: '',
 			prodSize: [],
-			prodDescription: '',
 			prodBrand: '',
+			prodBought: 0,
+			prodState: true,
+			prodIsSale: false,
+			prodSale: 0,
+			prodSalePrice: 0,
+			prodUrlList: [],
 		},
 		resolver: yupResolver(AddProductSchema),
 	});
 
 	//kết nối cơ sở dữ liệu
-	const ref = app.firestore().collection('products');
+	const ref = firebase.firestore().collection('products');
 
 	//function thêm sản phầm lên cơ sở dữ liệu
 	function addProduct(
@@ -88,9 +114,13 @@ const AddProduct: React.FC<Props> = () => {
 		prodBrand: string,
 		prodSize: string[],
 		prodPrice: number,
-		prodDescription: string,
 		prodUrlList: string[],
-		prodDate: Date
+		prodBought: number,
+		prodDate: Date,
+		prodState: boolean,
+		prodIsSale: boolean,
+		prodSale: number,
+		prodSalePrice: number
 	) {
 		ref
 			.doc()
@@ -99,9 +129,13 @@ const AddProduct: React.FC<Props> = () => {
 				prodBrand: prodBrand,
 				prodSize: prodSize,
 				prodPrice: prodPrice,
-				prodDescription: prodDescription,
 				prodUrlList: prodUrlList,
+				prodBought: prodBought,
 				prodDate: prodDate,
+				prodState: prodState,
+				prodIsSale: prodIsSale,
+				prodSale: prodSale,
+				prodSalePrice: prodSalePrice,
 			})
 			.catch((err) => {
 				console.log(err);
@@ -115,9 +149,13 @@ const AddProduct: React.FC<Props> = () => {
 			prodBrand,
 			prodSize,
 			prodPrice,
-			prodDescription,
 			prodImageUrl,
+			prodBought,
 			prodDate,
+			prodState,
+			prodIsSale,
+			prodSale,
+			prodSalePrice,
 		} = data;
 
 		const storageRef = await app.storage().ref();
@@ -130,15 +168,28 @@ const AddProduct: React.FC<Props> = () => {
 			});
 		}
 
-		await addProduct(prodName, prodBrand, prodSize, prodPrice, prodDescription, urlList, prodDate);
+		await addProduct(
+			prodName,
+			prodBrand,
+			prodSize,
+			prodPrice,
+			urlList,
+			prodBought,
+			prodDate,
+			prodState,
+			prodIsSale,
+			prodSale,
+			prodSalePrice
+		);
 		await setUrlList([]);
+		await alert('Thêm sản phẩm thành công !');
 		await reset();
 	};
 
 	return (
 		<Grid className={classes.root} xs={12}>
 			<Grid container xs={12} justify='center'>
-				<Typography className={classes.formTitle} variant='h5' component='p'>
+				<Typography className={classes.formTitle} variant='h3' component='p'>
 					Thêm sản phẩm mới
 				</Typography>
 			</Grid>
@@ -170,31 +221,6 @@ const AddProduct: React.FC<Props> = () => {
 						</Grid>
 					</Grid>
 
-					{/* <Grid container className={classes.boxForm} xs={12} justify='flex-end'>
-						<Grid className={classes.itemTitle} xs={4}>
-							<Typography variant='h6'>Màu sản phẩm:</Typography>
-						</Grid>
-						<Grid xs={8}>
-							<Controller
-								render={({ field }) => (
-									<TextField
-										{...field}
-										fullWidth
-										label='Khuyến khích'
-										variant='outlined'
-										size='small'
-										color='primary'
-										placeholder='Green,grey,black,...'
-										error={errors?.prodColor}
-										helperText={errors.prodColor?.message}
-									/>
-								)}
-								name='prodColor'
-								control={control}
-							/>
-						</Grid>
-					</Grid> */}
-
 					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>
 							<Typography variant='h6'>Kích cỡ sản phẩm:</Typography>
@@ -224,7 +250,7 @@ const AddProduct: React.FC<Props> = () => {
 						</Grid>
 					</Grid>
 
-					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
+					{/* <Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>
 							<Typography variant='h6'>Mô tả sản phẩm:</Typography>
 						</Grid>
@@ -250,7 +276,7 @@ const AddProduct: React.FC<Props> = () => {
 								control={control}
 							/>
 						</Grid>
-					</Grid>
+					</Grid> */}
 
 					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>

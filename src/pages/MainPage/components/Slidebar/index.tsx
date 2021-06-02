@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import { slideitem } from './Styles.js';
 import { makeStyles } from '@material-ui/core/styles';
@@ -6,7 +6,7 @@ import { Paper, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles({
 	root: {
-		paddingTop: '10px',
+		padding: '5px 10px 10px 30px',
 	},
 	Paper: (props) => ({
 		...props,
@@ -19,7 +19,7 @@ const useStyles = makeStyles({
 	Paper2: (props) => ({
 		...props,
 		backgroundImage:
-			'url(https://img.cungcap.net/media/2018/04/07/1523084683-hsk5c1523084683-giay-vans-marvel-2-thoi-trang.jpeg)',
+			'url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk0giciUHfBD4wyrdpzn4zcAzSnMaNGV1vHw&usqp=CAU)',
 	}),
 });
 
@@ -29,25 +29,25 @@ const Slidebar: React.FC<Props> = () => {
 	const classes = useStyles(slideitem);
 	return (
 		<Grid container xs={12} justify='center'>
-			<Grid item container className={classes.root} xs={10} justify='center'>
+			<Grid item container className={classes.root} xs={11} justify='center'>
 				<Grid item xs={4}>
 					<Paper className={classes.Paper} square>
 						<Typography variant='h6' component='p'>
-							Mua Ngay
+							ADIDAS
 						</Typography>
 					</Paper>
 				</Grid>
 				<Grid item xs={4}>
 					<Paper className={classes.Paper1} square>
 						<Typography variant='h6' component='p'>
-							Mua Ngay
+							NIKE
 						</Typography>
 					</Paper>
 				</Grid>
 				<Grid item xs={4}>
 					<Paper className={classes.Paper2} square>
 						<Typography variant='h6' component='p'>
-							Mua Ngay
+							YEEZY
 						</Typography>
 					</Paper>
 				</Grid>

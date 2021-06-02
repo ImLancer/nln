@@ -1,11 +1,31 @@
-import React, { ReactElement } from 'react';
+//import from local
+import logo from './images/logo5.png';
+import { style } from './style.js';
+
+//import necessary for react
+import React, { useState } from 'react';
+import clsx from 'clsx';
+import * as yup from 'yup';
+import { Link } from 'react-router-dom';
+
+//import for firebase
 import { auth } from 'firebase.js';
-import Grid from '@material-ui/core/Grid';
+
+//import for form
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Controller, useForm } from 'react-hook-form';
+
+//import for redux
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser, logout } from 'features/user/userSlice';
-import { Link } from 'react-router-dom';
+
+//import for material-core
+import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { InputBase, Typography } from '@material-ui/core';
+import { Typography, InputAdornment } from '@material-ui/core';
+
+//import icon
 import Badge from '@material-ui/core/Badge';
 import SearchIcon from '@material-ui/icons/Search';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
@@ -13,58 +33,24 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
-import logo from './images/logo2.png';
+import { GiReturnArrow } from 'react-icons/gi';
 
 const useStyles = makeStyles({
-	root: {
-		maxHeight: '30vh',
-		backgroundColor: 'lightgrey',
-	},
-	logo: {
-		cursor: 'pointer',
-	},
-	SearchBox: {
-		border: '1px solid #404040',
-		borderRadius: '6vh',
-	},
-	InputBase: {
-		padding: '5px',
-		width: '75%',
-		outline: 'none',
-	},
-	SearchIcon: {
-		fontSize: '2.5vw',
-		cursor: 'pointer',
-		padding: '3px',
-	},
-	CartIcon: {
-		fontSize: '2.2vw',
-		cursor: 'pointer',
-		transition: 'tranform 0.2s each-in-out',
-		'&:hover': {
-			transform: 'scale(1.03)',
-		},
-	},
-	AccountIcon: {
-		fontSize: '2.2vw',
-		cursor: 'pointer',
-		transition: 'tranform 0.2s each-in-out',
-		'&:hover': {
-			transform: 'scale(1.03)',
-		},
-	},
-	Typography: {
-		padding: '2px',
-		borderLeft: '1px solid black',
-		cursor: 'pointer',
-	},
+	...style,
 });
 
 interface Props {}
 
+interface search {
+	searchValue: string;
+}
+
 const Header: React.FC<Props> = () => {
 	//all state cho component
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const [showSearch, setShowSearch] = useState<boolean | undefined>(false);
+
+	//khai bao cho redux
 	const dispatch = useDispatch();
 
 	//all selector cho component
@@ -124,13 +110,104 @@ const Header: React.FC<Props> = () => {
 		</Menu>
 	);
 
+	//schema cho search
+	const searchSchema = yup.object().shape({
+		searchValue: yup.string().min(3, 'Nhập ít nhất 3 ký tự.').required(),
+	});
+
+	//khai bao cho form
+	const {
+		handleSubmit,
+		formState: { errors },
+		control,
+	} = useForm<search>({
+		defaultValues: {
+			searchValue: '',
+		},
+		resolver: yupResolver(searchSchema),
+	});
+
+	const searchBar = (
+		<Grid item container xs={10}>
+			<form style={{ width: '100%' }}>
+				<Controller
+					render={({ field }) => (
+						<TextField
+							{...field}
+							className={classes.searchBox}
+							fullWidth
+							type='text'
+							id='searchValue'
+							size='small'
+							variant='outlined'
+							placeholder='Nhập tên giày bạn muốn tìm kiếm...'
+							InputProps={{
+								className: classes.input,
+								endAdornment: (
+									<InputAdornment position='end'>
+										<IconButton
+											onClick={() => {
+												setShowSearch(false);
+											}}
+										>
+											<GiReturnArrow style={{ color: 'white' }} />
+										</IconButton>
+									</InputAdornment>
+								),
+							}}
+							error={errors?.searchValue}
+							helperText={errors.searchValue?.message}
+						/>
+					)}
+					name='searchValue'
+					control={control}
+				/>
+			</form>
+		</Grid>
+	);
+
 	return (
 		<Grid className={classes.root} container justify='center' alignItems='center'>
-			<Grid item container xs={10}>
-				<Grid item xs={2}>
-					<img className={classes.logo} height={60} width={60} src={logo} />
-				</Grid>
-				<Grid item container xs={8} justify='center' alignItems='center'>
+			{showSearch ? (
+				searchBar
+			) : (
+				<Grid item container xs={12}>
+					<Grid item xs={2}>
+						<Link to='/' style={{ textDecoration: 'none', color: 'black' }}>
+							<img className={classes.logo} height={65} width={120} src={logo} alt='' />
+						</Link>
+					</Grid>
+					<Grid
+						item
+						container
+						className={classes.Navbar}
+						xs={8}
+						justify='center'
+						alignItems='center'
+					>
+						<Grid item className={classes.box}>
+							<Link to='/' style={{ textDecoration: 'none', color: 'black' }}>
+								<Typography className={classes.TypographyNav}>Trang chủ</Typography>
+							</Link>
+						</Grid>
+						<Grid item className={classes.box}>
+							<Link to='/productpage' style={{ textDecoration: 'none', color: 'black' }}>
+								<Typography className={classes.TypographyNav}>Adidas</Typography>
+							</Link>
+						</Grid>
+						<Grid item className={classes.box}>
+							<Typography className={classes.TypographyNav}>Nike</Typography>
+						</Grid>
+						<Grid item className={classes.box}>
+							<Typography className={classes.TypographyNav}>Yeezy</Typography>
+						</Grid>
+						<Grid item className={classes.box}>
+							<Typography className={clsx(classes.TypographyNav, classes.TypographyLast)}>
+								Jordan
+							</Typography>
+						</Grid>
+					</Grid>
+					{/* <Grid item container xs={8} justify='center' alignItems='center'>
 					<Grid
 						className={classes.SearchBox}
 						item
@@ -142,30 +219,38 @@ const Header: React.FC<Props> = () => {
 						<SearchIcon className={classes.SearchIcon} />
 						<InputBase className={classes.InputBase} placeholder='Adidas, Nike,...' />
 						<Typography className={classes.Typography} variant='h6'>
-							Search
+							Tìm kiếm
 						</Typography>
 					</Grid>
-				</Grid>
-				<Grid item container xs={2} justify='flex-end' alignItems='center'>
-					<Grid item container justify='center' direction='row'>
-						<IconButton>
-							<Badge badgeContent={1} color='error'>
-								<ShoppingCartIcon className={classes.CartIcon} />
-							</Badge>
-						</IconButton>
-						<IconButton
-							edge='end'
-							aria-label='account of current user'
-							aria-haspopup='true'
-							onClick={handleProfileMenuOpen}
-							color='inherit'
-						>
-							<AccountCircleIcon className={classes.AccountIcon} />
-						</IconButton>
+				</Grid> */}
+					<Grid item container xs={2} justify='flex-end' alignItems='center'>
+						<Grid item container justify='flex-end' direction='row'>
+							<IconButton
+								onClick={() => {
+									setShowSearch(true);
+								}}
+							>
+								<SearchIcon className={classes.SearchIcon} />
+							</IconButton>
+							<IconButton>
+								<Badge badgeContent={0} color='error'>
+									<ShoppingCartIcon className={classes.CartIcon} />
+								</Badge>
+							</IconButton>
+							<IconButton
+								edge='end'
+								aria-label='account of current user'
+								aria-haspopup='true'
+								onClick={handleProfileMenuOpen}
+								color='inherit'
+							>
+								<AccountCircleIcon className={classes.AccountIcon} />
+							</IconButton>
+						</Grid>
+						{user === '' || user === null ? renderMenu : renderMenuUser}
 					</Grid>
-					{user === '' || user === null ? renderMenu : renderMenuUser}
 				</Grid>
-			</Grid>
+			)}
 		</Grid>
 	);
 };

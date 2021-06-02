@@ -1,53 +1,36 @@
-import Banner from 'pages/HomePage/components/Banner';
-import GreatProduct from 'pages/HomePage/components/GreatProduct';
+//import necessary for react
+import React, { ReactElement } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+
+//import page
 import Header from 'pages/HomePage/components/Header';
 import Navbar from 'pages/HomePage/components/Navbar';
-import Slidebar from 'pages/HomePage/components/Slidebar';
-import React, { ReactElement } from 'react';
 import Footer from './components/Footer/index';
-import UnitProduct from './components/UnitProduct/index';
-import ReverseUnitProduct from './components/ReverseUnitProduct/index';
-import { makeStyles } from '@material-ui/core/styles';
+import MainPage from 'pages/MainPage';
+import ProductPage from 'pages/ProductPage';
 
 interface Props {}
 
-const useStyles = makeStyles({
-	unitProduct: {
-		marginTop: '40px',
-	},
-});
-
 export default function HomePage({}: Props): ReactElement {
-	const classes = useStyles();
-
 	return (
 		<div>
-			{/*Header */}
-			<Header />
+			<Router>
+				{/*Header */}
+				<Header />
 
-			{/*NavBar*/}
-			<Navbar />
+				{/*NavBar*/}
+				<Navbar />
 
-			{/*Banner*/}
-			<Banner />
+				<Switch>
+					<Route path='/' exact component={MainPage} />
+					<Route path='/productpage' component={ProductPage} />
+					{/* <Route path='/signup' component={Signup} />
+					<Route path='/management' component={ManagementPage} /> */}
+				</Switch>
 
-			{/*Slidebar*/}
-			<Slidebar />
-
-			{/*San pham noi bat*/}
-			<GreatProduct />
-
-			{/*Adidas product */}
-			<UnitProduct />
-
-			{/*Nike product */}
-			<ReverseUnitProduct />
-
-			{/*Vans Product */}
-			<UnitProduct />
-
-			{/*Footer */}
-			<Footer />
+				{/*Footer */}
+				<Footer />
+			</Router>
 		</div>
 	);
 }
