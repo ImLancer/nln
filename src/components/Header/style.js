@@ -1,6 +1,6 @@
 export const style = {
 	root: {
-		height: '65px',
+		minHeight: '65px',
 		backgroundColor: '#262626',
 	},
 	logo: {
@@ -16,7 +16,7 @@ export const style = {
 		outline: 'none',
 	},
 	SearchIcon: {
-		fontSize: '2.5vw',
+		fontSize: '38px',
 		cursor: 'pointer',
 		color: 'white',
 		transition: 'tranform 0.2s each-in-out',
@@ -25,7 +25,7 @@ export const style = {
 		},
 	},
 	CartIcon: {
-		fontSize: '2.2vw',
+		fontSize: '32px',
 		cursor: 'pointer',
 		color: 'white',
 		transition: 'tranform 0.2s each-in-out',
@@ -34,7 +34,7 @@ export const style = {
 		},
 	},
 	AccountIcon: {
-		fontSize: '2.2vw',
+		fontSize: '32px',
 		cursor: 'pointer',
 		color: 'white',
 		paddingRight: '10px',
@@ -77,7 +77,7 @@ export const style = {
 	},
 	//css textfield
 	input: { color: 'white' },
-	searchBox: {
+	searchField: {
 		'& .MuiOutlinedInput-root': {
 			'& fieldset': {
 				borderColor: 'white',
@@ -89,5 +89,10 @@ export const style = {
 				borderColor: 'white',
 			},
 		},
+	},
+	//responsive
+	largeScreen: {
+		display: 'flex',
+		justifyContent: 'center',
 	},
 };

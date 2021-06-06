@@ -137,7 +137,7 @@ const Signup: React.FC<Props> = () => {
 	};
 
 	//ket noi csdl
-	const ref = firebase.firestore().collection('accounts');
+	const ref = db.collection('accounts');
 
 	//fucntion add tai khoan
 	function addAccount(
@@ -162,7 +162,7 @@ const Signup: React.FC<Props> = () => {
 				accountPoint: accountPoint,
 				accountMail: accountMail,
 			})
-			.then(() => history.push('/'))
+			.then(() => history.push('/login'))
 			.catch((err) => {
 				console.log(err);
 			});
@@ -184,22 +184,9 @@ const Signup: React.FC<Props> = () => {
 
 		let birthday = accountBirthday.toString();
 
-		await console.log(
-			accountUsername,
-			accountSex,
-			birthday,
-			accountPhone,
-			accountAddress,
-			accountType,
-			accountPoint,
-			accountMail
-		);
-
 		await auth
 			.createUserWithEmailAndPassword(accountMail, accountPassword)
-			.then((authUser) => {
-				console.log(authUser);
-			})
+			.then((authUser) => {})
 			.catch((error) => {
 				alert(error.message);
 			});

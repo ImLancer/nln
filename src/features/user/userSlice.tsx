@@ -1,12 +1,24 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
+import accountEntry from 'interfaces/account/accountEntry';
 
 interface user {
 	user: string | null;
+	userDetail: accountEntry;
 }
 
 const initialState: user = {
 	user: '',
+	userDetail: {
+		accountAddress: '',
+		accountBirthday: '',
+		accountMail: '',
+		accountPhone: '',
+		accountPoint: 0,
+		accountSex: '',
+		accountType: 'standard',
+		accountUsername: '',
+	},
 };
 
 export const userSlice = createSlice({
@@ -19,10 +31,25 @@ export const userSlice = createSlice({
 		logout: (state) => {
 			state.user = '';
 		},
+		AddUserDetail: (state, action: PayloadAction<accountEntry>) => {
+			state.userDetail = action.payload;
+		},
+		RemoveUserDetail: (state) => {
+			state.userDetail = {
+				accountAddress: '',
+				accountBirthday: '',
+				accountMail: '',
+				accountPhone: '',
+				accountPoint: 0,
+				accountSex: '',
+				accountType: 'standard',
+				accountUsername: '',
+			};
+		},
 	},
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, AddUserDetail, RemoveUserDetail } = userSlice.actions;
 
 // The function below is called a thunk and allows us to perform async logic. It
 // can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
@@ -35,5 +62,6 @@ export const { login, logout } = userSlice.actions;
 // };
 
 export const selectUser = (state: RootState) => state.user.user;
+export const selectUserDetail = (state: RootState) => state.user.userDetail;
 
 export default userSlice.reducer;

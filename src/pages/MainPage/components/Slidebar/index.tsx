@@ -3,6 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import { slideitem } from './Styles.js';
 import { makeStyles } from '@material-ui/core/styles';
 import { Paper, Typography } from '@material-ui/core';
+import { Link, useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
 	root: {
@@ -31,25 +32,31 @@ const Slidebar: React.FC<Props> = () => {
 		<Grid container xs={12} justify='center'>
 			<Grid item container className={classes.root} xs={11} justify='center'>
 				<Grid item xs={4}>
-					<Paper className={classes.Paper} square>
-						<Typography variant='h6' component='p'>
-							ADIDAS
-						</Typography>
-					</Paper>
+					<Link to={`/product/adidas`} style={{ textDecoration: 'none', color: 'black' }}>
+						<Paper className={classes.Paper} square>
+							<Typography variant='h6' component='p'>
+								ADIDAS
+							</Typography>
+						</Paper>
+					</Link>
 				</Grid>
 				<Grid item xs={4}>
-					<Paper className={classes.Paper1} square>
-						<Typography variant='h6' component='p'>
-							NIKE
-						</Typography>
-					</Paper>
+					<Link to={`/product/nike`} style={{ textDecoration: 'none', color: 'black' }}>
+						<Paper className={classes.Paper1} square>
+							<Typography variant='h6' component='p'>
+								NIKE
+							</Typography>
+						</Paper>
+					</Link>
 				</Grid>
 				<Grid item xs={4}>
-					<Paper className={classes.Paper2} square>
-						<Typography variant='h6' component='p'>
-							YEEZY
-						</Typography>
-					</Paper>
+					<Link to={`/product/yeezy`} style={{ textDecoration: 'none', color: 'black' }}>
+						<Paper className={classes.Paper2} square>
+							<Typography variant='h6' component='p'>
+								YEEZY
+							</Typography>
+						</Paper>
+					</Link>
 				</Grid>
 			</Grid>
 		</Grid>

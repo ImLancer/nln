@@ -12,6 +12,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 //import cho redux
+//import { useDispatch } from 'react-redux';
+//import { AddUnitProduct } from 'features/productList/productListSlice';
 
 //import interface
 import productEntry from 'interfaces/product/productEntry';
@@ -69,16 +71,20 @@ const AddProductSchema = yup.object().shape({
 	prodBrand: yup.string(),
 	prodPrice: yup.number().required().min(50000),
 	prodDescription: yup.string(),
-	prodDate: yup.date().default(function () {
-		return new Date(new Date().toDateString());
-	}),
 });
 
-interface Props {}
+interface Props {
+	handleLoading: Function;
+}
 
-const AddProduct: React.FC<Props> = () => {
+const AddProduct: React.FC<Props> = ({ handleLoading }) => {
+	//khai bao bien
+
 	//all useState sử dụng cho component
-	const [urlList, setUrlList] = useState([]); //chửa danh sách url từ người dùng nhập vào
+	let urlList: string[] = [];
+
+	//khai bao cho redux
+	//const dispatch = useDispatch();
 
 	//khai báo css
 	const classes = useStyles();
@@ -98,6 +104,7 @@ const AddProduct: React.FC<Props> = () => {
 			prodBought: 0,
 			prodState: true,
 			prodIsSale: false,
+			prodNameSale: '',
 			prodSale: 0,
 			prodSalePrice: 0,
 			prodUrlList: [],
@@ -106,7 +113,7 @@ const AddProduct: React.FC<Props> = () => {
 	});
 
 	//kết nối cơ sở dữ liệu
-	const ref = firebase.firestore().collection('products');
+	const ref = db.collection('products');
 
 	//function thêm sản phầm lên cơ sở dữ liệu
 	function addProduct(
@@ -116,9 +123,10 @@ const AddProduct: React.FC<Props> = () => {
 		prodPrice: number,
 		prodUrlList: string[],
 		prodBought: number,
-		prodDate: Date,
+		prodDate: string,
 		prodState: boolean,
 		prodIsSale: boolean,
+		prodNameSale: string,
 		prodSale: number,
 		prodSalePrice: number
 	) {
@@ -134,8 +142,13 @@ const AddProduct: React.FC<Props> = () => {
 				prodDate: prodDate,
 				prodState: prodState,
 				prodIsSale: prodIsSale,
+				prodNameSale: prodNameSale,
 				prodSale: prodSale,
 				prodSalePrice: prodSalePrice,
+			})
+			.then(async () => {
+				await alert('Thêm sản phẩm thành công !');
+				await window.location.reload();
 			})
 			.catch((err) => {
 				console.log(err);
@@ -144,6 +157,7 @@ const AddProduct: React.FC<Props> = () => {
 
 	//submit xử lí của form
 	const onSubmit = async (data: productEntry) => {
+		handleLoading(true);
 		const {
 			prodName,
 			prodBrand,
@@ -151,12 +165,16 @@ const AddProduct: React.FC<Props> = () => {
 			prodPrice,
 			prodImageUrl,
 			prodBought,
-			prodDate,
 			prodState,
 			prodIsSale,
 			prodSale,
+			prodNameSale,
 			prodSalePrice,
 		} = data;
+
+		let prodDate: Date = new Date();
+
+		let subDate: string = prodDate.toDateString().toString();
 
 		const storageRef = await app.storage().ref();
 
@@ -164,9 +182,21 @@ const AddProduct: React.FC<Props> = () => {
 			let fileRef = await storageRef.child(prodImageUrl[i].name);
 			await fileRef.put(prodImageUrl[i]);
 			await fileRef.getDownloadURL().then((url) => {
-				setUrlList(urlList.push(url));
+				urlList.push(url);
 			});
 		}
+
+		console.log(data);
+
+		//let handle: Date;
+
+		// await console.log(prodDate.toLocaleString());
+
+		// await console.log(subDate);
+
+		// handle = new Date(subDate);
+
+		// await console.log(handle);
 
 		await addProduct(
 			prodName,
@@ -175,15 +205,14 @@ const AddProduct: React.FC<Props> = () => {
 			prodPrice,
 			urlList,
 			prodBought,
-			prodDate,
+			subDate,
 			prodState,
 			prodIsSale,
+			prodNameSale,
 			prodSale,
 			prodSalePrice
 		);
-		await setUrlList([]);
-		await alert('Thêm sản phẩm thành công !');
-		await reset();
+		await handleLoading(false);
 	};
 
 	return (
@@ -249,34 +278,6 @@ const AddProduct: React.FC<Props> = () => {
 							/>
 						</Grid>
 					</Grid>
-
-					{/* <Grid container className={classes.boxForm} xs={12} justify='flex-end'>
-						<Grid className={classes.itemTitle} xs={4}>
-							<Typography variant='h6'>Mô tả sản phẩm:</Typography>
-						</Grid>
-						<Grid xs={8}>
-							<Controller
-								render={({ field }) => (
-									<TextField
-										{...field}
-										id='prodDescription'
-										label='Khuyến khích'
-										size='small'
-										color='primary'
-										multiline
-										rows={4}
-										fullWidth
-										placeholder='Mô tả sơ lược về sản phẩm.'
-										variant='outlined'
-										error={errors?.prodDescription}
-										helperText={errors.prodDescription?.message}
-									/>
-								)}
-								name='prodDescription'
-								control={control}
-							/>
-						</Grid>
-					</Grid> */}
 
 					<Grid container className={classes.boxForm} xs={12} justify='flex-end'>
 						<Grid className={classes.itemTitle} xs={4}>

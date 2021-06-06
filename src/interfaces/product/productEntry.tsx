@@ -1,4 +1,5 @@
 export default interface productEntry {
+	prodId: string;
 	prodName: string;
 	prodBrand: string;
 	prodSize: string[];
@@ -8,6 +9,7 @@ export default interface productEntry {
 	prodDate: Date;
 	prodState: boolean;
 	prodIsSale: boolean;
+	prodNameSale: string;
 	prodSale: number;
 	prodSalePrice: number;
 	prodUrlList: string[];
